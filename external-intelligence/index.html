@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>外部动态跟踪总结 · 轻量发送版</title>
+<title>外部动态跟踪总结</title>
 <style>
 :root{--ink:#183536;--muted:#6d7d7c;--line:#dfe7e4;--base:#f4f7f5;--surface:#fff;--accent:#0f7a64;--accent-soft:#eaf5f1;--danger:#a83b35;--warn:#b97918;--safe:#337f70;--shadow:0 8px 30px rgba(31,60,57,.055)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--base);color:var(--ink);font:14px/1.62 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:.01em}body.drawer-open{overflow:hidden}
@@ -57,13 +57,13 @@ section{padding:14px 16px;margin-bottom:12px;border-radius:10px;box-shadow:0 4px
 @media(max-width:900px){.filter-layout{grid-template-columns:1fr}.function-filter{padding:0 0 10px;border-right:0;border-bottom:1px solid #e5ece9}.function-filter .filter-row{grid-template-columns:repeat(4,minmax(0,1fr))}.issue-impact-bars,.classification-rule-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:760px){main{padding:12px}section{padding:12px}header{padding:14px}.header-meta{width:100%;gap:10px}.source-update{margin-left:auto}.filter-group{grid-template-columns:1fr;gap:3px}.function-filter .filter-row{display:flex}.function-filter .filter-chip{width:auto}.filter-actions{grid-template-columns:1fr}.filter-actions details[open]{grid-column:auto}.filter-actions .toolbar{justify-content:stretch}.impact-bars,.issue-impact-bars,.classification-rule-grid{grid-template-columns:1fr}select,input{max-width:100%}.toolbar>*{flex:1}h2{font-size:16px}.drawer{width:100vw}.drawer-head,.drawer-body{padding-left:15px;padding-right:15px}.event-meta,.issue-facts,.compact-statuses,.profile-two-column{grid-template-columns:1fr}.profile-two-column{gap:0}.profile-meta-strip{display:block}.profile-meta-strip span{display:block;margin:3px 0}}
 </style>
 <style>
-  .lightweight-banner{display:flex;align-items:center;justify-content:center;gap:10px;min-height:34px;padding:7px 18px;background:#fff4d8;color:#624b18;border-bottom:1px solid #ead6a4;font:12px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-  .lightweight-banner strong{color:#3f310f}.lightweight-banner span{color:#6f5a29}.unavailable-link{color:#788684;font-size:11px}
-  @media(max-width:640px){.lightweight-banner{align-items:flex-start;flex-direction:column;gap:1px}}
+  .disclaimer-banner{display:flex;align-items:center;justify-content:center;gap:10px;min-height:34px;padding:7px 18px;background:#eef4f0;color:#4c6660;border-bottom:1px solid #d5e3dd;font:12px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .disclaimer-banner strong{color:#2f4b46}.disclaimer-banner span{color:#51695f}.unavailable-link{color:#788684;font-size:11px}
+  @media(max-width:640px){.disclaimer-banner{align-items:flex-start;flex-direction:column;gap:1px}}
 </style>
 </head>
-<body><div class="lightweight-banner" role="note"><strong>轻量发送版</strong><span>外部动态、问题摘要和来源链接已保留；本地核验、审核明细与资料库文档未随包附带。</span></div>
-<header><strong>外部动态跟踪总结</strong><div class="header-meta"><div class="source-note">数据来源 <a class="source-badge" href="https://list.niccs.org.cn/" target="_blank" rel="noopener">PKC Forum ↗</a><a class="source-badge" href="https://ngcc.dev/" target="_blank" rel="noopener">NGCC-dev ↗</a></div><span class="catalog-link unavailable-link" title="算法目录未随轻量发送版附带">算法目录未随包附带</span><div class="source-update"><span>外部来源最新时间</span><time id="overallUpdate">正在读取</time></div></div></header>
+<body><div class="disclaimer-banner" role="note"><strong>个人研究使用</strong><span>相关统计和总结仅代表个人观点，外部动态信息以原始来源为准。</span></div>
+<header><strong>外部动态跟踪总结</strong><div class="header-meta"><div class="source-note">数据来源 <a class="source-badge" href="https://list.niccs.org.cn/" target="_blank" rel="noopener">PKC Forum ↗</a><a class="source-badge" href="https://ngcc.dev/" target="_blank" rel="noopener">NGCC-dev ↗</a></div><div class="source-update"><span>外部来源最新时间</span><time id="overallUpdate">正在读取</time></div></div></header>
 <main>
 <section class="filter-panel">
   <div class="section-head"><h2>筛选算法</h2><p>按算法功能、一级技术家族逐层选择；二级技术路线支持多选</p></div>
@@ -73,12 +73,12 @@ section{padding:14px 16px;margin-bottom:12px;border-radius:10px;box-shadow:0 4px
     <div class="filter-actions"><details><summary class="muted">更多筛选</summary><div id="extraFilters" class="filters"></div></details><div class="toolbar"><input id="q" type="search" aria-label="搜索算法" placeholder="搜索算法名称"><select id="sort" aria-label="排序"><option value="source">外部来源时间倒序</option><option value="name">算法名称</option></select><button id="reset">重置全部筛选</button></div></div>
   </div></div>
 </section>
-<section><div class="section-head"><h2>外部影响分布 · 算法数</h2><p>同一算法可能包含多类问题，算法数按类别分别去重</p></div><div id="impactBars" class="impact-bars"></div><div class="issue-impact-summary"><div class="issue-impact-head"><strong>外部影响分布 · 问题数</strong><span>每个规范化问题只进入一个类别</span></div><div id="issueImpactBars" class="issue-impact-bars"></div></div><details class="classification-guide"><summary class="classification-guide-head"><strong>分类规则说明</strong><span>按主要影响与所需修复层级互斥归类 · 展开查看</span></summary><div class="classification-rule-grid"><div class="classification-rule broken"><b>被攻破</b><p>已有实际攻击结果，能够恢复密钥或构造有效签名，并触及算法核心结构；通常需要对核心结构或创新机制作实质修改。</p></div><div class="classification-rule low"><b>低于安全强度（设计导致）</b><p>安全分析表明实际安全强度明显低于目标，根因来自设计参数或模块；通常需要调整设计层参数、结构或模块。</p></div><div class="classification-rule implementation"><b>实现缺陷</b><p>漏洞来自实现方式，例如溢出、越界、非常数时间或其他侧信道；修复以代码和实现工程为主。</p></div><div class="classification-rule specification"><b>规范缺口</b><p>证明、计算、规范描述或不同材料之间存在缺陷或不一致；通常通过补充证明、修正计算或完善文本处理。</p></div></div></details></section>
+<section><div class="section-head"><h2>外部影响分布 · 算法数</h2><p>同一算法可能包含多类问题，算法数按类别分别去重</p></div><div id="impactBars" class="impact-bars"></div><div class="issue-impact-summary"><div class="issue-impact-head"><strong>外部影响分布 · 问题数</strong><span>每个规范化问题只进入一个类别</span></div><div id="issueImpactBars" class="issue-impact-bars"></div></div><details class="classification-guide"><summary class="classification-guide-head"><strong>分类规则说明</strong><span>按主要影响与所需修复层级互斥归类 · 展开查看</span></summary><div class="classification-rule-grid"><div class="classification-rule broken"><b>严重</b><p>已有实际攻击结果，能够恢复密钥或构造有效签名，并触及算法核心结构；通常需要对核心结构或创新机制作实质修改。</p></div><div class="classification-rule low"><b>低于安全强度（设计导致）</b><p>安全分析表明实际安全强度明显低于目标，根因来自设计参数或模块；通常需要调整设计层参数、结构或模块。</p></div><div class="classification-rule implementation"><b>实现缺陷</b><p>漏洞来自实现方式，例如溢出、越界、非常数时间或其他侧信道；修复以代码和实现工程为主。</p></div><div class="classification-rule specification"><b>规范缺口</b><p>证明、计算、规范描述或不同材料之间存在缺陷或不一致；通常通过补充证明、修正计算或完善文本处理。</p></div></div></details></section>
 <section><div class="section-head"><h2>按发现问题汇总 <span id="selectionSummary" class="selection-summary"></span></h2><div class="section-actions"><button id="columnToggle" class="column-toggle" type="button" aria-pressed="false">显示进展与修复建议</button></div></div><div class="tablewrap"><table id="sumTable"></table></div><p id="coverage" class="coverage"></p></section>
-<footer>只读；问题按被攻破、低于安全强度（设计导致）、实现缺陷、规范缺口的顺序确定唯一展示类别。现有结构化字段不足以支持四类判断的问题不强行归类。顶部第一行按含有该类问题的算法数统计，第二行按规范化问题编号互斥计数。作者团队回应列根据结构化事件类型及来源首句提取关键动作；动作关键词不参与“确认问题”的判定。资料库内部审核不作作者确认，来源影响、本地核验和人工审核分开显示；缺件不补判。<span class="unavailable-link" title="完整规则未随轻量发送版附带">完整规则未随包附带</span></footer>
+<footer>只读；问题按严重、低于安全强度（设计导致）、实现缺陷、规范缺口的顺序确定唯一展示类别。现有结构化字段不足以支持四类判断的问题不强行归类。顶部第一行按含有该类问题的算法数统计，第二行按规范化问题编号互斥计数。作者团队回应列根据结构化事件类型及来源首句提取关键动作；动作关键词不参与“确认问题”的判定。资料库内部审核不作作者确认，来源影响、本地核验和人工审核分开显示；缺件不补判。</footer>
 </main>
 <div id="drawerBackdrop" class="drawer-backdrop"></div>
 <aside id="eventDrawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="eventTitle" aria-hidden="true"><div class="drawer-head"><div><h2 id="eventTitle">算法外部动态</h2><div id="eventLinks" class="links"></div></div><button id="drawerClose" class="drawer-close" type="button" aria-label="关闭侧边栏">×</button></div><div id="eventContent" class="drawer-body"></div></aside>
-<script src="intelligence-data.js"></script><script src="intelligence-view.js?v=20261013-style"></script>
+<script src="intelligence-data.js?v=20261015"></script><script src="intelligence-view.js?v=20261015"></script>
 </body>
 </html>
