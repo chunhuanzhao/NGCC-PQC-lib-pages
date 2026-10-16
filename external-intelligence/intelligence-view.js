@@ -1,15 +1,15 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const data=window.INTELLIGENCE_DATA;if(!data||data.schemaVersion!==1){$('coverage').textContent='展示数据缺失，请重新生成。';return;}
-const categories=['被攻破','低于安全强度（设计导致）','实现缺陷','规范缺口'];
-const columnClasses={'被攻破':'col-broken','低于安全强度（设计导致）':'col-low','实现缺陷':'col-implementation','规范缺口':'col-specification'};
+const categories=['严重','低于安全强度（设计导致）','实现缺陷','规范缺口'];
+const columnClasses={'严重':'col-broken','低于安全强度（设计导致）':'col-low','实现缺陷':'col-implementation','规范缺口':'col-specification'};
 const cats={kem:'密钥封装',signatures:'数字签名',kex:'密钥交换'};
 const layers={design:'设计',implementation:'实现',specification_consistency:'规范一致性'};
-const impactStatuses={broken:'被攻破的算法',low:'未攻破但低于安全强度的算法',stable:'暂未有明显安全衰减（无问题或仅实现、规范问题）'};
+const impactStatuses={broken:'存在严重问题的算法',low:'无严重问题但低于安全强度的算法',stable:'暂未有明显安全衰减（无问题或仅实现、规范问题）'};
 const cellNotes={
- 'signatures/sqisign2d2':{'被攻破':'容易修复'},
- 'signatures/lynxer':{'被攻破':'已发布修改版本'},
- 'signatures/morning-atlas':{'被攻破':'可修复'},
+ 'signatures/sqisign2d2':{'严重':'容易修复'},
+ 'signatures/lynxer':{'严重':'已发布修改版本'},
+ 'signatures/morning-atlas':{'严重':'可修复'},
  'kem/lore':{'低于安全强度（设计导致）':'已发布修改版本，待核验'},
  'signatures/bit':{'低于安全强度（设计导致）':'提出修改采样'},
  'kem/cheetahkem':{'低于安全强度（设计导致）':'需修改环结构'},
@@ -28,7 +28,7 @@ $('overallUpdate').textContent=overallSourceDate;
 const extraFields=[['impactStatus','算法外部影响',Object.keys(impactStatuses)],['platform','来源平台',unique(rows.flatMap(r=>r.platforms))],['layer','问题层面',Object.keys(layers)],['grade','严重程度',['重要','有限','暂无影响']],['review','人工审核',['待审核','已审核']]];
 extraFields.forEach(([key,title,options])=>{const el=document.createElement('select');el.id=key;el.setAttribute('aria-label',title);el.innerHTML='<option value="">'+title+'：全部</option>'+options.map(x=>'<option value="'+esc(x)+'">'+esc(impactStatuses[x]||layers[x]||x)+'</option>').join('');el.onchange=()=>{state[key]=el.value;render();};$('extraFilters').append(el);});
 
-function link(path,title){return '<span class="unavailable-link" title="资料库文档未随轻量发送版附带">'+esc(title)+'（未随包附带）</span>';}
+function link(path,title){return '<span class="unavailable-link" title="资料库文档未包含在本页">'+esc(title)+'（未包含）</span>';}
 function source(url,label){try{const u=new URL(url);if(!['https:','http:'].includes(u.protocol))return '';return '<a href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(label||u.hostname+' 原文')+'</a>';}catch{return '';}}
 const pending=(r,e)=>e.issueIds.some(id=>r.issues.find(i=>i.id===id)?.pending);
 const latest=r=>r.events.map(e=>e.date).filter(x=>/^\d{4}-\d{2}-\d{2}/.test(x)).sort().at(-1)||'';
@@ -53,7 +53,7 @@ const hardnessCell=r=>'<td class="hardness-cell" title="'+esc(r.hardProblems.joi
 
 function chip(kind,value,label,count,active){return '<button type="button" class="filter-chip '+(active?'active':'')+'" data-filter-kind="'+kind+'" data-filter-value="'+esc(value)+'">'+esc(label)+'<span>'+count+'</span></button>';}
 function grouped(items,idKey,labelKey,order){const groups={};items.forEach(r=>{const id=r[idKey]||'unknown',label=r[labelKey]||'未分类';if(!groups[id])groups[id]={id,label,count:0};groups[id].count++;});return Object.values(groups).sort((a,b)=>{const ai=order.indexOf(a.id),bi=order.indexOf(b.id),ap=ai<0?order.length:ai,bp=bi<0?order.length:bi;return ap-bp||b.count-a.count||a.label.localeCompare(b.label,'zh-CN');});}
-function algorithmImpactStatus(r){if(r.issues.some(i=>i.displayCategory==='被攻破'))return 'broken';if(r.issues.some(i=>i.displayCategory==='低于安全强度（设计导致）'))return 'low';return 'stable';}
+function algorithmImpactStatus(r){if(r.issues.some(i=>i.displayCategory==='严重'))return 'broken';if(r.issues.some(i=>i.displayCategory==='低于安全强度（设计导致）'))return 'low';return 'stable';}
 function renderPrimaryFilters(){
  $('categoryFilters').innerHTML=chip('category','','全部',rows.length,!state.category)+Object.keys(cats).map(id=>chip('category',id,cats[id],rows.filter(r=>r.category===id).length,state.category===id)).join('');
  const categoryRows=state.category?rows.filter(r=>r.category===state.category):rows,families=grouped(categoryRows,'familyId','family',familyOrder);
@@ -74,7 +74,7 @@ function selected(){
 }
 function renderImpactBars(rs){
  const items=[
-  ['broken','被攻破'],
+  ['broken','严重'],
   ['low','低于安全强度（设计导致）'],
   ['implementation','实现缺陷'],
   ['specification','规范缺口']
@@ -93,7 +93,7 @@ function render(){
  const responses=rs.flatMap(responseEvents);
  const responseCell=r=>'<td class="response-cell col-notice"><div class="response-actions">'+responseActionLinks(r.key,responseEvents(r),2)+'</div></td>';
  const algorithmCounts=Object.fromEntries(categories.map(category=>[category,rs.filter(r=>r.issues.some(i=>i.displayCategory===category)).length]));
- $('selectionSummary').textContent='（当前选择 '+rs.length+' 个算法、'+issues.length+' 个问题；其中 '+algorithmCounts['被攻破']+' 个算法被攻破、'+algorithmCounts['低于安全强度（设计导致）']+' 个算法低于安全强度、'+algorithmCounts['实现缺陷']+' 个算法存在实现缺陷、'+algorithmCounts['规范缺口']+' 个算法存在规范缺口；'+responses.length+' 条作者团队回应）';
+ $('selectionSummary').textContent='（当前选择 '+rs.length+' 个算法、'+issues.length+' 个问题；其中 '+algorithmCounts['严重']+' 个算法存在严重问题、'+algorithmCounts['低于安全强度（设计导致）']+' 个算法低于安全强度、'+algorithmCounts['实现缺陷']+' 个算法存在实现缺陷、'+algorithmCounts['规范缺口']+' 个算法存在规范缺口；'+responses.length+' 条作者团队回应）';
  const colgroup='<colgroup><col class="algorithm-col"><col class="tech-col"><col class="hardness-col">'+(supporting?'<col class="progress-col">':'')+'<col class="impact-col"><col class="low-col"><col class="impact-col"><col class="impact-col"><col class="response-col">'+(supporting?'<col class="repair-col">':'')+'<col class="date-col"></colgroup>';
  $('sumTable').classList.toggle('show-supporting',supporting);
  $('columnToggle').textContent=supporting?'隐藏进展与修复建议':'显示进展与修复建议';$('columnToggle').setAttribute('aria-pressed',String(supporting));
@@ -101,7 +101,7 @@ function render(){
  $('sumTable').innerHTML=colgroup+'<thead><tr>'+headers.map(([text,klass],n)=>'<th class="'+klass+(n>=impactStart&&n<impactStart+4?' num':'')+'">'+text+'</th>').join('')+'</tr></thead><tbody>'+rs.map(r=>'<tr><td class="algorithm-cell"><a class="algorithm-name" title="查看 '+esc(r.name)+' 方案概览" href="#" data-key="'+esc(r.key)+'" data-kind="algorithm-profile">'+esc(r.name)+'</a><div class="algorithm-function">'+esc(cats[r.category])+' · 方案概览</div>'+submitterDetails(r)+'</td><td class="tech-cell"><strong title="'+esc(r.family||'未分类')+'">'+esc(r.family||'未分类')+'</strong><div class="muted" title="'+esc(r.route||'未分类')+'">'+esc(r.route||'未分类')+'</div></td>'+hardnessCell(r)+(supporting?'<td>'+progress(r)+'</td>':'')+cells(r.key,r.issues,r.name)+responseCell(r)+(supporting?'<td class="repair-cell">'+issueRepairLinks(r.key,r.issues)+(r.warnings.length?'<div class="warning">'+esc(r.warnings.join('；'))+'</div>':'')+'</td>':'')+'<td class="source-date">'+esc(latest(r)||'来源未注明')+'</td></tr>').join('')+'</tbody>';
  $('coverage').textContent='问题按规范化问题编号互斥计数；同一算法可以包含多类问题。当前筛选包含 '+events.length+' 条外部动态。';closeDrawer();
 }
-function drawerLinks(key){return key==='*'?'':'<span class="unavailable-link" title="算法详情未随轻量发送版附带">算法详情（未随包附带）</span> '+link('', '完整分类表')+' '+link('', '算法动态');}
+function drawerLinks(key){return key==='*'?'':'<span class="unavailable-link" title="算法详情未包含在本页">算法详情（未包含）</span> '+link('', '完整分类表')+' '+link('', '算法动态');}
 const textList=items=>items.length?'<ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">当前资料未给出独立说明。</p>';
 const profileInline=value=>esc(value).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>');
 function profileProse(value,empty='当前资料尚未形成该项总结。'){
